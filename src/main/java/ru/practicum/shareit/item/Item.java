@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,15 +10,15 @@ import ru.practicum.shareit.request.ItemRequest;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemDto {
+public class Item {
     private long id;
     private String name;
     private String description;
     private Boolean available;
-    private long owner;
+    private Long owner;
     private ItemRequest request;
 
-    public ItemDto(long id, String name, String description, Boolean available, long owner) {
+    public Item(long id, String name, String description, Boolean available, Long owner) {
         this.id = id;
         this.owner = owner;
         this.name = name;
