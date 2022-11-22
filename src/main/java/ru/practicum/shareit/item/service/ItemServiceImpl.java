@@ -19,6 +19,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item add(Item item, long userId) {
         userDao.getUserById(userId);
+        item.setOwner(userDao.getUserById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь не найден")));
         return itemDao.add(item, userId);
     }
 
@@ -26,6 +28,8 @@ public class ItemServiceImpl implements ItemService {
     public Item update(Item item, long userId, long itemId) {
         userDao.getUserById(userId);
         itemDao.getItemById(itemId);
+        item.setOwner(userDao.getUserById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь не найден")));
         return itemDao.update(item, userId, itemId);
     }
 

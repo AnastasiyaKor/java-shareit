@@ -3,7 +3,6 @@ package ru.practicum.shareit.user.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.exceptions.ValidatorException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dao.UserDao;
 import ru.practicum.shareit.user.service.UserService;
@@ -17,11 +16,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        if (user.getName() == null)
-            throw new ValidatorException("Имя не должно быть пустым");
-        if (user.getEmail() == null || !user.getEmail().contains("@")) {
-            throw new ValidatorException("Несуществующий email");
-        }
         return userDao.create(user);
     }
 

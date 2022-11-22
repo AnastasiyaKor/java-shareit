@@ -4,7 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.marker.Marker;
+import ru.practicum.shareit.user.User;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 
 @Data
 @Builder
@@ -12,17 +17,13 @@ import ru.practicum.shareit.request.ItemRequest;
 @NoArgsConstructor
 public class ItemDto {
     private long id;
+    @NotBlank(groups = {Marker.Create.class})
     private String name;
+    @NotBlank(groups = {Marker.Create.class})
     private String description;
+    @NotNull(groups = {Marker.Create.class})
     private Boolean available;
-    private long owner;
-    private ItemRequest request;
+    private User owner;
+    private Long request;
 
-    public ItemDto(long id, String name, String description, Boolean available, long owner) {
-        this.id = id;
-        this.owner = owner;
-        this.name = name;
-        this.description = description;
-        this.available = available;
-    }
 }

@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.user.User;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
@@ -12,17 +15,13 @@ import ru.practicum.shareit.request.ItemRequest;
 @NoArgsConstructor
 public class Item {
     private long id;
+    @NotBlank
     private String name;
+    @NotBlank
     private String description;
+    @NotNull
     private Boolean available;
-    private Long owner;
-    private ItemRequest request;
+    private User owner;
+    private Long request;
 
-    public Item(long id, String name, String description, Boolean available, Long owner) {
-        this.id = id;
-        this.owner = owner;
-        this.name = name;
-        this.description = description;
-        this.available = available;
-    }
 }

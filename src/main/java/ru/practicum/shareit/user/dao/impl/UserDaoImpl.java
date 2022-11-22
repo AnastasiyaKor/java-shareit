@@ -17,30 +17,20 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User create(User user) {
-        for (User u : userList) {
-            if (user.getEmail().contains(u.getEmail())) {
-                throw new ConflictException("Пользователь с такой почтой уже существует");
-            }
-
-        }
+        checkingMail(user);
         user.setId(++createId);
         userList.add(user);
         return user;
     }
 
+
     @Override
     public User update(User user, long userId) {
         User newUser = new User();
-        for (User uw : userList) {
-            if (user.getEmail() != null) {
-                if (uw.getEmail().contains(user.getEmail())) {
-                    throw new ConflictException("Почта уже существует");
-                }
-            }
-        }
+        checkingMail(user);
         for (User u : userList) {
             if (u.getId() == userId) {
-                if (user.getName() != null) {
+                if (user.getName() != null && !user.getName().isBlank()) {
                     u.setName(user.getName());
                 }
                 if (user.getEmail() != null) {
@@ -50,6 +40,16 @@ public class UserDaoImpl implements UserDao {
             }
         }
         return newUser;
+    }
+
+    private void checkingMail(User user) {
+        for (User uw : userList) {
+            if (user.getEmail() != null) {
+                if (uw.getEmail().contains(user.getEmail())) {
+                    throw new ConflictException("Почта уже существует");
+                }
+            }
+        }
     }
 
     @Override
