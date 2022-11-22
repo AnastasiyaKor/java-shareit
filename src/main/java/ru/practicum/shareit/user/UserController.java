@@ -19,8 +19,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/users")
 @AllArgsConstructor
 public class UserController {
-    private  final  UserService userService;
+    private final UserService userService;
     private final ConversionService conversionService;
+
     @PostMapping
     @Validated({Marker.Create.class})
     public UserDto create(@RequestBody @Valid UserDto userDto) {
