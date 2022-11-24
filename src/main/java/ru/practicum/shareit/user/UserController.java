@@ -1,6 +1,6 @@
 package ru.practicum.shareit.user;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.validation.annotation.Validated;
@@ -9,22 +9,19 @@ import ru.practicum.shareit.marker.Marker;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Validated
 @RestController
 @RequestMapping("/users")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     private final ConversionService conversionService;
 
     @PostMapping
-    @Validated({Marker.Create.class})
-    public UserDto create(@RequestBody @Valid UserDto userDto) {
+    public UserDto create(@RequestBody @Validated({Marker.Create.class}) UserDto userDto) {
         log.info("Получен запрос на добавление пользователя");
         User newUser = UserMapper.toUser(userDto);
         User user = userService.create(newUser);
@@ -32,8 +29,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    @Validated({Marker.Update.class})
-    public UserDto update(@PathVariable long userId, @RequestBody @Valid UserDto userDto) {
+    public UserDto update(@PathVariable long userId, @RequestBody @Validated({Marker.Update.class}) UserDto userDto) {
         log.info("Получен запрос на редактирование пользователя");
         User newUser = UserMapper.toUser(userDto);
         User user = userService.update(newUser, userId);
@@ -41,15 +37,15 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUserById(@PathVariable long userId) {
+    public UserDto getById(@PathVariable long userId) {
         log.info("Получен запрос на просмотр пользователя");
-        return UserMapper.toUserDto(userService.getUserById(userId));
+        return UserMapper.toUserDto(userService.getById(userId));
     }
 
     @GetMapping
-    public List<UserDto> findAllUser() {
+    public List<UserDto> findAll() {
         log.info("Получен запрос на просмотр всех пользователей");
-        List<User> users = userService.findAllUser();
+        List<User> users = userService.findAll();
         return users.stream()
                 .map(user -> conversionService.convert(user, UserDto.class))
                 .collect(Collectors.toList());
@@ -60,5 +56,4 @@ public class UserController {
         log.info("Получен запрос на удаление пользователя");
         userService.delete(userId);
     }
-
 }

@@ -9,7 +9,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,7 +17,7 @@ public class UserDto {
     @NotBlank(groups = {Marker.Create.class})
     private String name;
     @Email(groups = {Marker.Create.class, Marker.Update.class})
-    @NotNull(groups = {Marker.Create.class})
+    @NotNull(groups = {Marker.Create.class}, message = "Почта не должна быть пустой")
     private String email;
 
 }

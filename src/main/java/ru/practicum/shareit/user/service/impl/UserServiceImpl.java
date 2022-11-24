@@ -21,24 +21,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user, long userId) {
-        getUserById(userId);
+        getById(userId);
         return userDao.update(user, userId);
     }
 
     @Override
-    public User getUserById(long userId) {
-        return userDao.getUserById(userId).orElseThrow(() ->
+    public User getById(long userId) {
+        return userDao.getById(userId).orElseThrow(() ->
                 new NotFoundException("пользователь не найден"));
     }
 
     @Override
-    public List<User> findAllUser() {
-        return userDao.findAllUser();
+    public List<User> findAll() {
+        return userDao.findAll();
     }
 
     @Override
     public void delete(long id) {
-        getUserById(id);
+        getById(id);
         userDao.delete(id);
     }
 }

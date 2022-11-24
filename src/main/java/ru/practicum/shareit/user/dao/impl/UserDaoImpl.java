@@ -12,23 +12,22 @@ import java.util.Optional;
 
 @Component
 public class UserDaoImpl implements UserDao {
-    private final List<User> userList = new ArrayList<>();
+    private final List<User> usersList = new ArrayList<>();
     private long createId = 0;
 
     @Override
     public User create(User user) {
         checkingMail(user);
         user.setId(++createId);
-        userList.add(user);
+        usersList.add(user);
         return user;
     }
-
 
     @Override
     public User update(User user, long userId) {
         User newUser = new User();
         checkingMail(user);
-        for (User u : userList) {
+        for (User u : usersList) {
             if (u.getId() == userId) {
                 if (user.getName() != null && !user.getName().isBlank()) {
                     u.setName(user.getName());
@@ -43,7 +42,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     private void checkingMail(User user) {
-        for (User uw : userList) {
+        for (User uw : usersList) {
             if (user.getEmail() != null) {
                 if (uw.getEmail().contains(user.getEmail())) {
                     throw new ConflictException("Почта уже существует");
@@ -53,20 +52,18 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public Optional<User> getUserById(long userId) {
-
-        return Optional.ofNullable(userList.stream().filter(user -> user.getId() == userId)
+    public Optional<User> getById(long userId) {
+        return Optional.ofNullable(usersList.stream().filter(user -> user.getId() == userId)
                 .findAny().orElseThrow(() -> new NotFoundException("Пользователь не найден")));
     }
 
     @Override
-    public List<User> findAllUser() {
-        return userList;
+    public List<User> findAll() {
+        return usersList;
     }
 
     @Override
     public void delete(long userId) {
-
-        userList.removeIf(user -> user.getId() == userId);
+        usersList.removeIf(user -> user.getId() == userId);
     }
 }

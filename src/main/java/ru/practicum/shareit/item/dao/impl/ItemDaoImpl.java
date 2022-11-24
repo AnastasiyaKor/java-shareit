@@ -11,62 +11,53 @@ import java.util.stream.Collectors;
 @Component
 public class ItemDaoImpl implements ItemDao {
     private long createId = 0;
-    private final Map<Long, Item> newItem = new HashMap<>();
+    private final Map<Long, Item> items = new HashMap<>();
     private final Map<Long, List<Item>> userItemIndex = new LinkedHashMap<>();
 
     @Override
     public Item add(Item item, long userId) {
         item.setId(++createId);
-        final List<Item> items = userItemIndex.computeIfAbsent(item.getOwner().getId(), k -> new ArrayList<>());
-        userItemIndex.put(userId, items);
-        newItem.put(item.getId(), item);
+        userItemIndex.computeIfAbsent(item.getOwner().getId(), k -> new ArrayList<>());
+        items.put(item.getId(), item);
         return item;
     }
 
     @Override
     public Item update(Item item, long userId, long itemId) {
-        Item newItem1 = new Item();
-        boolean check = false;
-        for (Item i : newItem.values()) {
-            if (i.getId() == itemId && i.getOwner().getId() == userId) {
-                check = true;
-                if (item.getName() != null && !item.getName().isBlank()) {
-                    i.setName(item.getName());
-                }
-                if (item.getDescription() != null && !item.getDescription().isBlank()) {
-                    i.setDescription(item.getDescription());
-                }
-                if (item.getAvailable() != null) {
-                    i.setAvailable(item.getAvailable());
-                }
-                newItem1 = i;
+        if (items.containsValue(items.get(itemId)) && items.get(itemId).getOwner().getId() == userId) {
+            if (item.getName() != null && !item.getName().isBlank()) {
+                items.get(itemId).setName(item.getName());
             }
-        }
-        if (!check) {
+            if (item.getDescription() != null && !item.getDescription().isBlank()) {
+                items.get(itemId).setDescription(item.getDescription());
+            }
+            if (item.getAvailable() != null) {
+                items.get(itemId).setAvailable(item.getAvailable());
+            }
+        } else {
             throw new NotFoundException("Вещь не найдена");
         }
-        return newItem1;
+        return items.get(itemId);
     }
 
     @Override
-    public Optional<Item> getItemById(long itemId) {
-        return Optional.ofNullable(newItem.values().stream().filter(item -> item.getId() == itemId)
-                .findAny().orElseThrow(() -> new NotFoundException("Вещь не найдена")));
+    public Optional<Item> getById(long itemId) {
+        return Optional.ofNullable(items.get(itemId));
     }
 
     @Override
-    public List<Item> getAllItems(long userId) {
-        return newItem.values().stream()
+    public List<Item> getAll(long userId) {
+        return items.values().stream()
                 .filter(item -> item.getOwner().getId() == userId)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Item> search(String text) {
-        return newItem.values().stream()
+        return items.values().stream()
                 .filter(i -> (i.getName().toLowerCase().contains(text.toLowerCase())
                         || i.getDescription().toLowerCase().contains(text.toLowerCase()))
-                        && i.getAvailable().toString().contains("true"))
+                        && i.getAvailable())
                 .collect(Collectors.toList());
     }
 }

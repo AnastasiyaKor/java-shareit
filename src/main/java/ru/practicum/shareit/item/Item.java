@@ -1,18 +1,12 @@
 package ru.practicum.shareit.item;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.User;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class Item {
     private long id;
     @NotBlank
@@ -24,4 +18,11 @@ public class Item {
     private User owner;
     private Long request;
 
+    public Item(long id, String name, String description, Boolean available, Long request) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.available = available;
+        this.request = request;
+    }
 }

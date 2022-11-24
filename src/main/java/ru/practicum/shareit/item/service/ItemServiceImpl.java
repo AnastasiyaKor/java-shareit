@@ -18,35 +18,35 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item add(Item item, long userId) {
-        userDao.getUserById(userId);
-        item.setOwner(userDao.getUserById(userId).orElseThrow(() ->
+        userDao.getById(userId);
+        item.setOwner(userDao.getById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь не найден")));
         return itemDao.add(item, userId);
     }
 
     @Override
     public Item update(Item item, long userId, long itemId) {
-        userDao.getUserById(userId);
-        itemDao.getItemById(itemId);
-        item.setOwner(userDao.getUserById(userId).orElseThrow(() ->
+        userDao.getById(userId);
+        itemDao.getById(itemId);
+        item.setOwner(userDao.getById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь не найден")));
         return itemDao.update(item, userId, itemId);
     }
 
     @Override
-    public Item getItemById(long itemId) {
-        return itemDao.getItemById(itemId).orElseThrow(() ->
+    public Item getById(long itemId) {
+        return itemDao.getById(itemId).orElseThrow(() ->
                 new NotFoundException("вещь не найдена"));
     }
 
     @Override
-    public List<Item> getAllItems(long userId) {
-        return itemDao.getAllItems(userId);
+    public List<Item> getAll(long userId) {
+        return itemDao.getAll(userId);
     }
 
     @Override
     public List<Item> search(String text, long userId) {
-        userDao.getUserById(userId);
+        userDao.getById(userId);
         return itemDao.search(text);
     }
 }

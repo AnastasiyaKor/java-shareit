@@ -9,13 +9,11 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.marker.Marker;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@Validated
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/items")
@@ -24,35 +22,33 @@ public class ItemController {
     private final ConversionService conversionService;
 
     @PostMapping
-    @Validated({Marker.Create.class})
-    ItemDto add(@RequestBody @Valid ItemDto itemDto, @RequestHeader("X-Sharer-User-id") long userId) {
+    ItemDto add(@RequestBody @Validated({Marker.Create.class}) ItemDto itemDto,
+                @RequestHeader("X-Sharer-User-id") long userId) {
         log.info("Получен запрос от пользователя: " + userId + " на добавление вещи");
         Item newItem = ItemMapper.toItem(itemDto);
-        Item item = itemService.add(newItem, userId);
-        return ItemMapper.toItemDto(item);
+        return ItemMapper.toItemDto(itemService.add(newItem, userId));
     }
 
     @PatchMapping("/{itemId}")
-    @Validated({Marker.Update.class})
-    ItemDto update(@RequestBody @Valid ItemDto itemDto, @RequestHeader("X-Sharer-User-id") long userId,
+    ItemDto update(@RequestBody @Validated({Marker.Update.class}) ItemDto itemDto,
+                   @RequestHeader("X-Sharer-User-id") long userId,
                    @PathVariable long itemId) {
-        log.info("Получен запрос от пользователя " + userId + " на редактирование вещи под идентификатором: " + itemId);
+        log.info("Получен запрос от пользователя " + userId +
+                " на редактирование вещи под идентификатором: " + itemId);
         Item newItem = ItemMapper.toItem(itemDto);
-        Item item = itemService.update(newItem, userId, itemId);
-        return ItemMapper.toItemDto(item);
+        return ItemMapper.toItemDto(itemService.update(newItem, userId, itemId));
     }
 
     @GetMapping("/{itemId}")
-    ItemDto getItemById(@PathVariable long itemId) {
+    ItemDto getById(@PathVariable long itemId) {
         log.info("Получен запрос от пользователя на просмотр вещи под идентификатором: " + itemId);
-        return ItemMapper.toItemDto(itemService.getItemById(itemId));
+        return ItemMapper.toItemDto(itemService.getById(itemId));
     }
 
     @GetMapping
-    List<ItemDto> getAllItems(@RequestHeader("X-Sharer-User-id") long userId) {
+    List<ItemDto> getAll(@RequestHeader("X-Sharer-User-id") long userId) {
         log.info("Получен запрос от пользователя" + userId + " на просмотр всех своих вещей");
-      List<Item> items = itemService.getAllItems(userId);
-        return items.stream()
+        return itemService.getAll(userId).stream()
                 .map(item -> conversionService.convert(item, ItemDto.class))
                 .collect(Collectors.toList());
     }
@@ -60,7 +56,7 @@ public class ItemController {
     @GetMapping("/search")
     List<ItemDto> search(@RequestParam String text, @RequestHeader("X-Sharer-User-id") long userId) {
         log.info("Получен запрос от пользователя" + userId + " на поиск вещи");
-        List<Item> items = new ArrayList<>();
+        List<Item> items = Collections.emptyList();
         if (!text.isBlank()) {
             items = itemService.search(text, userId);
         }

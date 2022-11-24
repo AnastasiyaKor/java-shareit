@@ -10,9 +10,9 @@ public interface ItemDao {
 
     Item update(Item item, long userId, long itemId);
 
-    Optional<Item> getItemById(long itemId);
+    Optional<Item> getById(long itemId);
 
-    List<Item> getAllItems(long userId);
+    List<Item> getAll(long userId);
 
     List<Item> search(String text);
 }
