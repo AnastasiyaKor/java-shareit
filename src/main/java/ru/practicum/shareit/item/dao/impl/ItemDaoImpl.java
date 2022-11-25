@@ -24,20 +24,21 @@ public class ItemDaoImpl implements ItemDao {
 
     @Override
     public Item update(Item item, long userId, long itemId) {
-        if (items.containsValue(items.get(itemId)) && items.get(itemId).getOwner().getId() == userId) {
+        Item getItem = items.get(itemId);
+        if (items.containsValue(getItem) && getItem.getOwner().getId() == userId) {
             if (item.getName() != null && !item.getName().isBlank()) {
-                items.get(itemId).setName(item.getName());
+                getItem.setName(item.getName());
             }
             if (item.getDescription() != null && !item.getDescription().isBlank()) {
-                items.get(itemId).setDescription(item.getDescription());
+                getItem.setDescription(item.getDescription());
             }
             if (item.getAvailable() != null) {
-                items.get(itemId).setAvailable(item.getAvailable());
+                getItem.setAvailable(item.getAvailable());
             }
         } else {
             throw new NotFoundException("Вещь не найдена");
         }
-        return items.get(itemId);
+        return getItem;
     }
 
     @Override

@@ -43,7 +43,7 @@ public class UserDaoImpl implements UserDao {
 
     private void checkingMail(User user) {
         for (User uw : usersList) {
-            if (user.getEmail() != null) {
+            if (user.getEmail() != null && !(uw.getId() == user.getId())) {
                 if (uw.getEmail().contains(user.getEmail())) {
                     throw new ConflictException("Почта уже существует");
                 }
