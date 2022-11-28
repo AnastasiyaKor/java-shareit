@@ -1,2 +1,4 @@
 # java-shareit
-Template repository for Shareit project.
+Спринт 14.
+Проект ShareIt. 
+Приложение для шеринга. 
