@@ -19,5 +19,4 @@ public class UserDto {
     @Email(groups = {Marker.Create.class, Marker.Update.class})
     @NotNull(groups = {Marker.Create.class}, message = "Почта не должна быть пустой")
     private String email;
-
 }
