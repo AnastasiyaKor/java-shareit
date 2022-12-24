@@ -29,7 +29,6 @@ public class BookingController {
         UserDtoRequest userDtoRequest = new UserDtoRequest();
         userDtoRequest.setId(userId);
         bookingDto.setBooker(userDtoRequest);
-
         ItemDtoLastNext itemDtoRequest = new ItemDtoLastNext();
         itemDtoRequest.setId(bookingDto.getItemId());
         Item item = itemService.getById(bookingDto.getItemId());
