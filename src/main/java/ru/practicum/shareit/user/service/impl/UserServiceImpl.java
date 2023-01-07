@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user.service.impl;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,31 +12,28 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-//@AllArgsConstructor
-@Transactional(readOnly = true)//добавлен
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    @Transactional//добавлен
+    @Transactional
     public User create(User user) {
         return userRepository.save(user);
     }
 
     @Override
-    @Transactional//добавлен
+    @Transactional
     public User update(User user, long userId) {
         User updateUser = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("пользователь не найден"));
-        //добавлен
         if (user.getName() != null && !user.getName().isBlank()) {
             updateUser.setName(user.getName());
         }
-        //добавлен
         if (user.getEmail() != null && !user.getEmail().isBlank()) {
             updateUser.setEmail(user.getEmail());
         }
-        return updateUser;//userRepository.save(updateUser);
+        return updateUser;
     }
 
     @Override
@@ -52,7 +48,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional//добавлен
+    @Transactional
     public void delete(long userId) {
         getById(userId);
         userRepository.deleteById(userId);
