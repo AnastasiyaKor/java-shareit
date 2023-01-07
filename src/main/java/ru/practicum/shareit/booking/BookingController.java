@@ -4,13 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.enumeration.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.item.dto.ItemDtoLastNext;
-import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.user.dto.UserDtoRequest;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,22 +16,12 @@ import java.util.stream.Collectors;
 @RequestMapping(path = "/bookings")
 public class BookingController {
     private final BookingService bookingService;
-    private final ItemService itemService;
 
     @PostMapping
-    public BookingDto createRequest(@RequestBody BookingDto bookingDto,
+    public BookingDto createRequest(@Valid @RequestBody BookingDto bookingDto,
                                     @RequestHeader("X-Sharer-User-id") long userId) {
         log.info("Получен запрос на добавление бронирования");
-        UserDtoRequest userDtoRequest = new UserDtoRequest();
-        userDtoRequest.setId(userId);
-        bookingDto.setBooker(userDtoRequest);
-        ItemDtoLastNext itemDtoRequest = new ItemDtoLastNext();
-        itemDtoRequest.setId(bookingDto.getItemId());
-        Item item = itemService.getById(bookingDto.getItemId());
-        itemDtoRequest.setName(item.getName());
-        bookingDto.setItem(itemDtoRequest);
-        Booking newBooking = BookingMapper.toBooking(bookingDto);
-        Booking booking = bookingService.createRequest(newBooking, userId);
+        Booking booking = bookingService.createRequest(bookingDto, userId);
         return BookingMapper.toBookingDto(booking);
     }
 
@@ -56,7 +42,7 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getAllBookingUser(@RequestHeader("X-Sharer-User-id") long userId,
-                                              @RequestParam(required = false, defaultValue = "ALL") BookingState state) {
+                                              @RequestParam(defaultValue = "ALL") String state) {
         log.info("Получен запрос на просмотр списка всех бронирований пользователя");
         List<Booking> bookings = bookingService.getAllBookingUser(userId, state);
         return bookings.stream()
@@ -66,7 +52,7 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingDto> getAllItemsBookingUser(@RequestHeader("X-Sharer-User-id") long userId,
-                                                   @RequestParam(required = false, defaultValue = "ALL") BookingState state) {
+                                                   @RequestParam(defaultValue = "ALL") String state) {
         log.info("Получен запрос на просмотр списка бронирований для всех вещей пользователя");
         List<Booking> bookings = bookingService.getAllItemsBookingUser(userId, state);
         return bookings.stream()

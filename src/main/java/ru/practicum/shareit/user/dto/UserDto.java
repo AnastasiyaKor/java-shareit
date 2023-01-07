@@ -18,6 +18,7 @@ public class UserDto {
     private long id;
     @NotBlank(groups = {Marker.Create.class})
     private String name;
+    @NotBlank(groups = {Marker.Create.class})
     @Email(groups = {Marker.Create.class, Marker.Update.class})
     @NotNull(groups = {Marker.Create.class}, message = "Почта не должна быть пустой")
     private String email;

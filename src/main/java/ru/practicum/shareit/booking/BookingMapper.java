@@ -39,4 +39,5 @@ public class BookingMapper {
                 booking.getBooker().getId()
         );
     }
+
 }

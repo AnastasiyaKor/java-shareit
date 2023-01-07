@@ -2,7 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.shareit.user.User;
 
@@ -11,11 +11,10 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "comments", schema = "public")
-
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

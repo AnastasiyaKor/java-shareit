@@ -7,11 +7,10 @@ import javax.persistence.*;
 
 @Setter
 @Getter
-
 @Builder
 @Entity(name = "items")
 @Table(name = "items", schema = "public")
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 public class Item {
     @Id

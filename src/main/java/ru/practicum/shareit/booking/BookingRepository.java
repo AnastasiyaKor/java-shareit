@@ -1,7 +1,9 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.shareit.booking.enumeration.Status;
+import ru.practicum.shareit.item.Item;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,8 +12,8 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByBookerIdOrderByStartDesc(Long bookerId);
 
-    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
-            Long bookerId, LocalDateTime dateTime, LocalDateTime localDateTime);
+    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfter(
+            Long bookerId, LocalDateTime dateTime, LocalDateTime localDateTime, Sort sort);
 
     List<Booking> findAllByBookerIdAndEndBeforeOrderByStartDesc(Long bookerId, LocalDateTime localDateTime);
 
@@ -30,9 +32,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByItem_OwnerIdAndStatusOrderByStartDesc(Long ownerId, Status status);
 
-    Optional<Booking> findFirstByItem_Owner_IdAndItem_IdOrderByStart(Long ownerId, Long itemId);
+    List<Booking> findByItemIn(List<Item> items, Sort sort);
 
-    Optional<Booking> findFirstByItem_OwnerIdAndIdOrderByStartDesc(Long ownerId, Long itemId);
+    Optional<Booking> findFirstByItem_Owner_IdAndItem_IdAndEndLessThanEqualOrderByStart(
+            Long ownerId, Long itemId, LocalDateTime localDateTime);
+
+    Optional<Booking> findFirstByItem_OwnerIdAndIdAndStartGreaterThanEqualOrderByStart(
+            Long ownerId, Long itemId, LocalDateTime localDateTime);
 
     List<Booking> findBookingByItem_IdAndBooker_IdAndEndBefore(Long itemId, Long userId, LocalDateTime localDateTime);
 }
