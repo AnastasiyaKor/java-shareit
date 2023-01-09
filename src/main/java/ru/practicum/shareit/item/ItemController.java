@@ -5,6 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.comment.Comment;
+import ru.practicum.shareit.item.comment.CommentDto;
+import ru.practicum.shareit.item.comment.CommentMapper;
+import ru.practicum.shareit.item.comment.CommentRequestDto;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -40,13 +44,13 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    CommentDto createComment(@Validated @RequestBody CommentDto commentDto,
+    CommentDto createComment(@Validated @RequestBody CommentRequestDto commentRequestDto,
                              @RequestHeader("X-Sharer-User-id") Long userId,
                              @PathVariable Long itemId) {
         log.info("Получен запрос от пользователя: " + userId + " на добавление комментария");
-        Item item = itemService.getById(itemId);
-        User user = userService.getById(userId);
-        Comment comment = itemService.createComment(CommentMapper.toComment(commentDto, item, user));
+        itemService.getById(itemId);
+        userService.getById(userId);
+        Comment comment = itemService.createComment(commentRequestDto, userId, itemId);
         return CommentMapper.toCommentDto(comment);
     }
 

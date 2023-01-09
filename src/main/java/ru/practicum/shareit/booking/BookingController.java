@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
+import ru.practicum.shareit.booking.enumeration.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
@@ -18,10 +20,11 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public BookingDto createRequest(@Valid @RequestBody BookingDto bookingDto,
+    public BookingDto createRequest(@Valid @RequestBody BookingRequestDto bookingRequestDto,
                                     @RequestHeader("X-Sharer-User-id") long userId) {
-        log.info("Получен запрос на добавление бронирования");
-        Booking booking = bookingService.createRequest(bookingDto, userId);
+        log.info("Получен запрос на добавление бронирования от пользователя" + userId);
+
+        Booking booking = bookingService.createRequest(bookingRequestDto, userId);
         return BookingMapper.toBookingDto(booking);
     }
 
@@ -42,19 +45,21 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getAllBookingUser(@RequestHeader("X-Sharer-User-id") long userId,
-                                              @RequestParam(defaultValue = "ALL") String state) {
+                                              @RequestParam(defaultValue = "ALL") BookingState state) {
         log.info("Получен запрос на просмотр списка всех бронирований пользователя");
         List<Booking> bookings = bookingService.getAllBookingUser(userId, state);
-        return bookings.stream()
-                .map(BookingMapper::toBookingDto)
-                .collect(Collectors.toList());
+        return toListBookingDto(bookings);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllItemsBookingUser(@RequestHeader("X-Sharer-User-id") long userId,
-                                                   @RequestParam(defaultValue = "ALL") String state) {
+                                                   @RequestParam(defaultValue = "ALL") BookingState state) {
         log.info("Получен запрос на просмотр списка бронирований для всех вещей пользователя");
         List<Booking> bookings = bookingService.getAllItemsBookingUser(userId, state);
+        return toListBookingDto(bookings);
+    }
+
+    private List<BookingDto> toListBookingDto(List<Booking> bookings) {
         return bookings.stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
