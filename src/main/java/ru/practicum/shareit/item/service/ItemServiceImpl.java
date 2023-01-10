@@ -90,7 +90,8 @@ public class ItemServiceImpl implements ItemService {
             lastBooking = BookingMapper.toBookingDtoLastNext(last.get());
         }
         Optional<Booking> next = bookingRepository
-                .findFirstByItem_OwnerIdAndIdAndStartAfterOrderByStart(userId, item.getId(), currentTime);
+                .findFirstByItem_OwnerIdAndIdAndStartAfterAndStatusEqualsOrderByStart(
+                        userId, item.getId(), currentTime, Status.APPROVED);
         if (next.isPresent()) {
             nextBooking = BookingMapper.toBookingDtoLastNext(next.get());
         }
