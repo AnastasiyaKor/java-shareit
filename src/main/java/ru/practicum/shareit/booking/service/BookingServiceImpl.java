@@ -99,13 +99,13 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfter(
                         userId, date, date, sort);
             case PAST:
-                return bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, date);
+                return bookingRepository.findAllByBookerIdAndEndBefore(userId, date, sort);
             case FUTURE:
-                return bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(userId, date);
+                return bookingRepository.findAllByBookerIdAndStartAfter(userId, date, sort);
             case WAITING:
-                return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, WAITING);
+                return bookingRepository.findAllByBookerIdAndStatus(userId, WAITING, sort);
             case REJECTED:
-                return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, REJECTED);
+                return bookingRepository.findAllByBookerIdAndStatus(userId, REJECTED, sort);
             default:
                 throw new UnknownStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
@@ -114,22 +114,23 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> getAllItemsBookingUser(long ownerId, BookingState status) {
         LocalDateTime date = LocalDateTime.now();
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
         userRepository.findById(ownerId).orElseThrow(() ->
                 new NotFoundException("Пользователь не найден"));
         switch (status) {
             case ALL:
-                return bookingRepository.findAllByItem_OwnerIdOrderByStartDesc(ownerId);
+                return bookingRepository.findAllByItem_OwnerId(ownerId, sort);
             case CURRENT:
-                return bookingRepository.findAllByItem_OwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
-                        ownerId, date, date);
+                return bookingRepository.findAllByItem_OwnerIdAndStartBeforeAndEndAfter(
+                        ownerId, date, date, sort);
             case PAST:
-                return bookingRepository.findAllByItem_OwnerIdAndEndBeforeOrderByStartDesc(ownerId, date);
+                return bookingRepository.findAllByItem_OwnerIdAndEndBefore(ownerId, date, sort);
             case FUTURE:
-                return bookingRepository.findAllByItem_OwnerIdAndStartAfterOrderByStartDesc(ownerId, date);
+                return bookingRepository.findAllByItem_OwnerIdAndStartAfter(ownerId, date, sort);
             case WAITING:
-                return bookingRepository.findAllByItem_OwnerIdAndStatusOrderByStartDesc(ownerId, WAITING);
+                return bookingRepository.findAllByItem_OwnerIdAndStatus(ownerId, WAITING, sort);
             case REJECTED:
-                return bookingRepository.findAllByItem_OwnerIdAndStatusOrderByStartDesc(ownerId, REJECTED);
+                return bookingRepository.findAllByItem_OwnerIdAndStatus(ownerId, REJECTED, sort);
             default:
                 throw new UnknownStatusException("Unknown state: UNSUPPORTED_STATUS");
         }

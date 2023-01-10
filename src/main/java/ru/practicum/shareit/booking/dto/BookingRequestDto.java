@@ -5,6 +5,7 @@ import ru.practicum.shareit.booking.valid.DateValid;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,10 +15,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @DateValid
 public class BookingRequestDto {
-    private Long id;
     @FutureOrPresent
     private LocalDateTime start;
     @Future
     private LocalDateTime end;
+    @NotNull
     private Long itemId;
 }

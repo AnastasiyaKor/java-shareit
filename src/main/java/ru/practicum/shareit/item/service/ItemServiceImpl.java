@@ -52,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
         userRepository.findById(userId);
         Item updateItem = getById(itemId);
         if (Objects.equals(updateItem.getOwner().getId(), userId)) {
-            if (item.getName() != null) {
+            if (item.getName() != null && !item.getName().isBlank()) {
                 updateItem.setName(item.getName());
             }
             if (item.getDescription() != null && !item.getDescription().isBlank()) {
@@ -106,7 +106,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemBookingDto> getAll(Long userId) {
-        LocalDateTime localDateTime = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         userRepository.findById(userId);
         List<ItemBookingDto> itemsBooking = new ArrayList<>();
         List<Item> items = itemRepository.findAllByOwnerIdOrderById(userId);
@@ -114,9 +114,8 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .collect(groupingBy(Comment::getItem, toList()));
         Map<Item, List<Booking>> lastNextBooking = bookingRepository
-                .findByItemIn(items, Sort.by(ASC, "start"))
+                .findByItemInAndStatusEquals(items, Sort.by(ASC, "start"), Status.APPROVED)
                 .stream()
-                .filter(booking -> booking.getStatus().equals(Status.APPROVED))
                 .collect(groupingBy(Booking::getItem, toList()));
         for (Item item : items) {
             BookingDtoLastNext lastBooking = null;
@@ -125,12 +124,11 @@ public class ItemServiceImpl implements ItemService {
                 if (lastNextBooking.get(item) != null) {
                     lastBooking = BookingMapper.toBookingDtoLastNext(Objects.requireNonNull(lastNextBooking.get(item)
                             .stream()
-                            .filter(booking -> booking.getEnd().isBefore(localDateTime)
-                                    || booking.getStart().isEqual(localDateTime))
-                            .min(Collections.reverseOrder()).orElse(null)));
+                            .filter(booking -> !booking.getStart().isAfter(now))
+                            .max(Comparator.comparing(Booking::getStart)).orElse(null)));
                     nextBooking = BookingMapper.toBookingDtoLastNext((Objects.requireNonNull(lastNextBooking.get(item)
                             .stream()
-                            .filter(booking -> booking.getStart().isAfter(localDateTime))
+                            .filter(booking -> booking.getStart().isAfter(now))
                             .sorted()
                             .findFirst().orElse(null))));
                 }

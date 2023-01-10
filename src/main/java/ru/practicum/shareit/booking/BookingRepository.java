@@ -15,24 +15,24 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByBookerIdAndStartBeforeAndEndAfter(
             Long bookerId, LocalDateTime start, LocalDateTime end, Sort sort);
 
-    List<Booking> findAllByBookerIdAndEndBeforeOrderByStartDesc(Long bookerId, LocalDateTime start);
+    List<Booking> findAllByBookerIdAndEndBefore(Long bookerId, LocalDateTime start, Sort sort);
 
-    List<Booking> findAllByBookerIdAndStartAfterOrderByStartDesc(Long bookerId, LocalDateTime start);
+    List<Booking> findAllByBookerIdAndStartAfter(Long bookerId, LocalDateTime start, Sort sort);
 
-    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(Long bookerId, Status status);
+    List<Booking> findAllByBookerIdAndStatus(Long bookerId, Status status, Sort sort);
 
-    List<Booking> findAllByItem_OwnerIdOrderByStartDesc(Long ownerId);
+    List<Booking> findAllByItem_OwnerId(Long ownerId, Sort sort);
 
-    List<Booking> findAllByItem_OwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
-            Long ownerId, LocalDateTime start, LocalDateTime end);
+    List<Booking> findAllByItem_OwnerIdAndStartBeforeAndEndAfter(
+            Long ownerId, LocalDateTime start, LocalDateTime end, Sort sort);
 
-    List<Booking> findAllByItem_OwnerIdAndEndBeforeOrderByStartDesc(Long ownerId, LocalDateTime start);
+    List<Booking> findAllByItem_OwnerIdAndEndBefore(Long ownerId, LocalDateTime start, Sort sort);
 
-    List<Booking> findAllByItem_OwnerIdAndStartAfterOrderByStartDesc(Long ownerId, LocalDateTime start);
+    List<Booking> findAllByItem_OwnerIdAndStartAfter(Long ownerId, LocalDateTime start, Sort sort);
 
-    List<Booking> findAllByItem_OwnerIdAndStatusOrderByStartDesc(Long ownerId, Status status);
+    List<Booking> findAllByItem_OwnerIdAndStatus(Long ownerId, Status status, Sort sort);
 
-    List<Booking> findByItemIn(List<Item> items, Sort sort);
+    List<Booking> findByItemInAndStatusEquals(List<Item> items, Sort sort, Status status);
 
     Optional<Booking> findFirstByItem_Owner_IdAndItem_IdAndEndLessThanEqualAndStatusEqualsOrderByStartDesc(
             Long ownerId, Long itemId, LocalDateTime end, Status status);

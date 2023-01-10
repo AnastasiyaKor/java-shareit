@@ -7,6 +7,9 @@ import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.item.dto.ItemDtoLastNext;
 import ru.practicum.shareit.user.dto.UserDtoRequest;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @UtilityClass
 public class BookingMapper {
     public static BookingDto toBookingDto(Booking booking) {
@@ -23,7 +26,6 @@ public class BookingMapper {
 
     public static Booking fromBookingRequestDto(BookingRequestDto bookingRequestDto) {
         return Booking.builder()
-                .id(bookingRequestDto.getId())
                 .start(bookingRequestDto.getStart())
                 .end(bookingRequestDto.getEnd())
                 .build();
@@ -36,4 +38,9 @@ public class BookingMapper {
         );
     }
 
+    public List<BookingDto> toListBookingDto(List<Booking> bookings) {
+        return bookings.stream()
+                .map(BookingMapper::toBookingDto)
+                .collect(Collectors.toList());
+    }
 }

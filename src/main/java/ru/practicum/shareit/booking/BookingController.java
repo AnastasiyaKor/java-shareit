@@ -10,7 +10,6 @@ import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -48,7 +47,7 @@ public class BookingController {
                                               @RequestParam(defaultValue = "ALL") BookingState state) {
         log.info("Получен запрос на просмотр списка всех бронирований пользователя");
         List<Booking> bookings = bookingService.getAllBookingUser(userId, state);
-        return toListBookingDto(bookings);
+        return BookingMapper.toListBookingDto(bookings);
     }
 
     @GetMapping("/owner")
@@ -56,12 +55,6 @@ public class BookingController {
                                                    @RequestParam(defaultValue = "ALL") BookingState state) {
         log.info("Получен запрос на просмотр списка бронирований для всех вещей пользователя");
         List<Booking> bookings = bookingService.getAllItemsBookingUser(userId, state);
-        return toListBookingDto(bookings);
-    }
-
-    private List<BookingDto> toListBookingDto(List<Booking> bookings) {
-        return bookings.stream()
-                .map(BookingMapper::toBookingDto)
-                .collect(Collectors.toList());
+        return BookingMapper.toListBookingDto(bookings);
     }
 }

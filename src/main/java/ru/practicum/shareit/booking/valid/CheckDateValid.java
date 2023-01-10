@@ -14,12 +14,11 @@ public class CheckDateValid implements ConstraintValidator<DateValid, BookingReq
     @Override
     public boolean isValid(BookingRequestDto bookingRequestDto,
                            ConstraintValidatorContext constraintValidatorContext) {
-        final LocalDateTime date = LocalDateTime.now();
         LocalDateTime end = bookingRequestDto.getEnd();
         LocalDateTime start = bookingRequestDto.getStart();
         if (end == null || start == null) {
             return false;
         }
-        return (end.isAfter(date) && end.isAfter(start) && !start.isBefore(date));
+        return (end.isAfter(start));
     }
 }
