@@ -22,5 +22,5 @@ public class ItemDto {
     @NotNull(groups = {Marker.Create.class})
     private Boolean available;
     private UserDto owner;
-    private Long request;
+    private Long requestId;
 }

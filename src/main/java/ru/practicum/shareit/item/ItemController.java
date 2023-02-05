@@ -74,17 +74,21 @@ public class ItemController {
     }
 
     @GetMapping
-    List<ItemBookingDto> getAll(@RequestHeader("X-Sharer-User-id") Long userId) {
+    List<ItemBookingDto> getAll(@RequestHeader("X-Sharer-User-id") Long userId,
+                                @RequestParam(required = false,defaultValue = "0") int from,
+                                @RequestParam(required = false,defaultValue = "10") int size) {
         log.info("Получен запрос от пользователя" + userId + " на просмотр всех своих вещей");
-        return itemService.getAll(userId);
+        return itemService.getAll(userId, from, size);
     }
 
     @GetMapping("/search")
-    List<ItemDto> search(@RequestParam String text, @RequestHeader("X-Sharer-User-id") long userId) {
+    List<ItemDto> search(@RequestParam String text, @RequestHeader("X-Sharer-User-id") long userId,
+                         @RequestParam(required = false,defaultValue = "0") int from,
+                         @RequestParam(required = false,defaultValue = "10") int size) {
         log.info("Получен запрос от пользователя" + userId + " на поиск вещи");
         List<Item> items = Collections.emptyList();
         if (!text.isBlank()) {
-            items = itemService.search(text, userId);
+            items = itemService.search(text, userId, from, size);
         }
         return items.stream()
                 .map(item -> conversionService.convert(item, ItemDto.class))

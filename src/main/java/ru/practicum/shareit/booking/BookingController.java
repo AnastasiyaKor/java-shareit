@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
@@ -9,12 +10,14 @@ import ru.practicum.shareit.booking.enumeration.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
+@Validated
 public class BookingController {
     private final BookingService bookingService;
 
@@ -44,17 +47,24 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getAllBookingUser(@RequestHeader("X-Sharer-User-id") long userId,
-                                              @RequestParam(defaultValue = "ALL") BookingState state) {
+                                              @RequestParam(required = false, defaultValue = "ALL") BookingState state,
+                                              @RequestParam(required = false, defaultValue = "0") @Min(0) int from,
+                                              @RequestParam(required = false, defaultValue = "10") @Min(1) int size) {
         log.info("Получен запрос на просмотр списка всех бронирований пользователя");
-        List<Booking> bookings = bookingService.getAllBookingUser(userId, state);
+
+        List<Booking> bookings = bookingService.getAllBookingUser(userId, state, from, size);
         return BookingMapper.toListBookingDto(bookings);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllItemsBookingUser(@RequestHeader("X-Sharer-User-id") long userId,
-                                                   @RequestParam(defaultValue = "ALL") BookingState state) {
+                                                   @RequestParam(defaultValue = "ALL") BookingState state,
+                                                   @RequestParam(required = false, defaultValue = "0")
+                                                   @Min(0) int from,
+                                                   @RequestParam(required = false, defaultValue = "10")
+                                                   @Min(1) int size) {
         log.info("Получен запрос на просмотр списка бронирований для всех вещей пользователя");
-        List<Booking> bookings = bookingService.getAllItemsBookingUser(userId, state);
+        List<Booking> bookings = bookingService.getAllItemsBookingUser(userId, state, from, size);
         return BookingMapper.toListBookingDto(bookings);
     }
 }

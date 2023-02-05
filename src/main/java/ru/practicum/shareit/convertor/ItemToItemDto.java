@@ -15,7 +15,7 @@ public class ItemToItemDto implements Converter<Item, ItemDto> {
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setAvailable(item.getAvailable());
-        itemDto.setRequest(item.getRequest());
+        itemDto.setRequestId(item.getRequestId() != null ? item.getRequestId().getId() : null);
         return itemDto;
     }
 }

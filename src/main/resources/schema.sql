@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS requests
 (
     id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     description  VARCHAR(1024),
-    requestor_id BIGINT REFERENCES users (id) ON DELETE CASCADE
+    request_id BIGINT REFERENCES users (id) ON DELETE CASCADE,
+    created TIMESTAMP WITHOUT TIME ZONE
 
 );
 CREATE TABLE IF NOT EXISTS items
@@ -22,7 +23,7 @@ CREATE TABLE IF NOT EXISTS items
     description VARCHAR(1024),
     available   BOOLEAN,
     owner       BIGINT REFERENCES users (id) ON DELETE CASCADE,
-    request     BIGINT REFERENCES requests (id) ON DELETE CASCADE
+    request_id     BIGINT REFERENCES requests (id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS bookings
 (

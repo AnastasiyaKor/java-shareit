@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,6 +46,9 @@ public class ItemServiceImpl implements ItemService {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь не найден"));
         item.setOwner(user);
+        if (item.getRequestId() == null) {
+            item.setRequestId(null);
+        }
         return itemRepository.save(item);
     }
 
@@ -82,7 +88,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = getById(itemId);
         BookingDtoLastNext lastBooking = null;
         BookingDtoLastNext nextBooking = null;
-        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime currentTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         Optional<Booking> last = bookingRepository
                 .findFirstByItem_Owner_IdAndItem_IdAndEndLessThanEqualAndStatusEqualsOrderByStartDesc(
                         userId, item.getId(), currentTime, Status.APPROVED);
@@ -106,11 +112,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemBookingDto> getAll(Long userId) {
+    public List<ItemBookingDto> getAll(Long userId, int from, int size) {
+        Pageable pageable = PageRequest.of(from, size);
         LocalDateTime now = LocalDateTime.now();
         userRepository.findById(userId);
         List<ItemBookingDto> itemsBooking = new ArrayList<>();
-        List<Item> items = itemRepository.findAllByOwnerIdOrderById(userId);
+        List<Item> items = itemRepository.findAllByOwnerIdOrderById(userId, pageable);
         Map<Item, List<Comment>> comments = commentRepository.findByItemIn(items, Sort.by(DESC, "created"))
                 .stream()
                 .collect(groupingBy(Comment::getItem, toList()));
@@ -149,16 +156,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> search(String text, long userId) {
+    public List<Item> search(String text, long userId, int from, int size) {
+        Pageable pageable = PageRequest.of(from, size);
         userRepository.findById(userId);
         return itemRepository.findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue(
-                text, text);
+                text, text, pageable);
     }
 
     @Override
     @Transactional
     public Comment createComment(CommentRequestDto commentRequestDto, Long userId, Long itemId) {
-        LocalDateTime dateTime = LocalDateTime.now();
+        LocalDateTime dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         Item item = getById(itemId);
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь не найден"));
