@@ -163,8 +163,8 @@ class BookingRepositoryTest {
 
     @Test
     void findFirstByItem_Owner_IdAndItem_IdAndEndLessThanEqualAndStatusEqualsOrderByStartDesc() {
-        Booking booking = bookingRepository.
-                findFirstByItem_Owner_IdAndItem_IdAndEndLessThanEqualAndStatusEqualsOrderByStartDesc(owner.getId(),
+        Booking booking = bookingRepository
+        .findFirstByItem_Owner_IdAndItem_IdAndEndLessThanEqualAndStatusEqualsOrderByStartDesc(owner.getId(),
                         item.getId(), currentTime, Status.APPROVED).orElse(null);
         assertEquals(bookingPAST.getId(), booking.getId());
         assertEquals(bookingPAST.getStart(), booking.getStart());
@@ -174,8 +174,8 @@ class BookingRepositoryTest {
 
     @Test
     void findFirstByItem_OwnerIdAndIdAndStartAfterAndStatusEqualsOrderByStart() {
-        Booking booking = bookingRepository.
-                findFirstByItem_OwnerIdAndIdAndStartAfterAndStatusEqualsOrderByStart(
+        Booking booking = bookingRepository
+                .findFirstByItem_OwnerIdAndIdAndStartAfterAndStatusEqualsOrderByStart(
                         owner.getId(), item.getId(), currentTime, Status.APPROVED).orElse(null);
         assertNull(booking);
     }

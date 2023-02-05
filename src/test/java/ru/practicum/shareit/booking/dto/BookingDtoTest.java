@@ -38,7 +38,7 @@ class BookingDtoTest {
     @BeforeEach
     void setUp() throws IOException {
         owner = new User(1L, "Mark", "Mark@mail.ru");
-        booker = new User(2l, "Vova", "vova@mail.ru");
+        booker = new User(2L, "Vova", "vova@mail.ru");
         item = Item.builder()
                 .id(1L)
                 .name("drill")
