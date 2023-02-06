@@ -21,8 +21,12 @@ public class ItemItemRequestDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ItemItemRequestDto that = (ItemItemRequestDto) o;
-        return Objects.equals(name, that.name) && Objects.equals(description, that.description) &&
-                Objects.equals(available, that.available) && Objects.equals(requestId, that.requestId);
+        return Objects.equals(name, that.name) && Objects.equals(description, that.description)
+                && Objects.equals(available, that.available) && Objects.equals(requestId, that.requestId);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, available, requestId);
+    }
 }

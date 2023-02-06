@@ -30,7 +30,11 @@ class UserServiceImplTest {
 
     @BeforeEach
     void init() {
-        user = new User(1L, "Masha", "Masha@mail.ru");
+        user = User.builder()
+                .id(1L)
+                .name("Masha")
+                .email("Masha@mail.ru")
+                .build();
     }
 
     @AfterEach

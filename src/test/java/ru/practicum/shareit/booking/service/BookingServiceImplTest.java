@@ -11,7 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
@@ -25,13 +26,13 @@ import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceImplTest {
@@ -70,7 +71,11 @@ class BookingServiceImplTest {
                 .build();
         booking = new Booking(
                 1L, LocalDateTime.now(), LocalDateTime.now().plusDays(2), item, booker, Status.WAITING);
-        bookingRequestDto = new BookingRequestDto(LocalDateTime.now(), LocalDateTime.now().plusDays(3), item.getId());
+        bookingRequestDto = BookingRequestDto.builder()
+                .start(LocalDateTime.now())
+                .start(LocalDateTime.now().plusDays(3))
+                .itemId(item.getId())
+                .build();
     }
 
     @AfterEach
@@ -299,7 +304,6 @@ class BookingServiceImplTest {
                 List<Booking> bookings3 = bookingService.getAllBookingUser(booker.getId(), state, 0, 10);
                 assertEquals(bookings3.size(), 1);
                 break;
-
             case WAITING:
             case REJECTED:
                 Mockito
@@ -309,7 +313,7 @@ class BookingServiceImplTest {
                 List<Booking> bookings4 = bookingService.getAllBookingUser(booker.getId(), state, 0, 10);
                 assertEquals(bookings4.size(), 1);
                 break;
-            default:
+            case UNSUPPORTED_STATUS:
                 UnknownStatusException exception = assertThrows(UnknownStatusException.class, () -> {
                     bookingService.getAllBookingUser(booker.getId(), state, 0, 10);
                 });
@@ -377,7 +381,7 @@ class BookingServiceImplTest {
                 List<Booking> bookings4 = bookingService.getAllItemsBookingUser(owner.getId(), state, 0, 10);
                 assertEquals(bookings4.size(), 1);
                 break;
-            default:
+            case UNSUPPORTED_STATUS:
                 UnknownStatusException exception = assertThrows(UnknownStatusException.class, () -> {
                     bookingService.getAllItemsBookingUser(owner.getId(), state, 0, 10);
                 });

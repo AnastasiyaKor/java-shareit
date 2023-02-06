@@ -60,13 +60,29 @@ class ItemRequestControllerTest {
         requestor = new User(2L, "Nina", "nina@mail.ru");
         itemRequest = new ItemRequest(1L, "drill", requestor, LocalDateTime.now());
         item = new Item(1L, "drill", "drill pro", true, owner, itemRequest);
-        itemRequestDto = new ItemRequestDto(itemRequest.getId(), itemRequest.getDescription(),
-                itemRequest.getRequestor().getId(), itemRequest.getCreated());
-        itemRequestDtoRequest = new ItemRequestDtoRequest(itemRequest.getId(), itemRequest.getDescription());
-        itemItemRequestDto = new ItemItemRequestDto(item.getId(), item.getName(), item.getDescription(), item.getAvailable(),
-                item.getRequestId().getId());
-        itemRequestDtoResult = new ItemRequestDtoResult(1L, itemRequest.getDescription(), itemRequest.getCreated(),
-                List.of(itemItemRequestDto));
+        itemRequestDto = ItemRequestDto.builder()
+                .id(itemRequest.getId())
+                .description(itemRequest.getDescription())
+                .requestorId(itemRequest.getRequestor().getId())
+                .created(itemRequest.getCreated())
+                .build();
+        itemRequestDtoRequest = ItemRequestDtoRequest.builder()
+                .id(itemRequest.getId())
+                .description(itemRequest.getDescription())
+                .build();
+        itemItemRequestDto = ItemItemRequestDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .requestId(item.getRequestId().getId())
+                .build();
+        itemRequestDtoResult = ItemRequestDtoResult.builder()
+                .id(itemRequest.getId())
+                .description(itemRequest.getDescription())
+                .created(itemRequest.getCreated())
+                .items(List.of(itemItemRequestDto))
+                .build();
     }
 
     @AfterEach

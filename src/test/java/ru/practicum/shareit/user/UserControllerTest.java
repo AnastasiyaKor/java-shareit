@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.practicum.shareit.LocalDateTimeAdapter;
+import ru.practicum.shareit.exceptions.ValidatorException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -43,9 +44,21 @@ class UserControllerTest {
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
                 .serializeNulls()
                 .create();
-        user = new User(1L, "Vova", "vova@mail.ru");
-        user1 = new User(2L, "Mark", "mark@mail.ru");
-        userDto = new UserDto(user.getId(), user.getName(), user.getEmail());
+        user = User.builder()
+                .id(1L)
+                .name("Vova")
+                .email("vova@mail.ru")
+                .build();
+        user1 = User.builder()
+                .id(2L)
+                .name("Mark")
+                .email("mark@mail.ru")
+                .build();
+        userDto = UserDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
     }
 
     @Test
@@ -63,6 +76,43 @@ class UserControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(user.getId()));
+    }
+
+    @Test
+    void createValidatorException() throws Exception {
+        Mockito.when(userService.create(any()))
+                .thenThrow(ValidatorException.class);
+        User notEmail = User.builder()
+                .name("Lev")
+                .build();
+        mockMvc.perform(
+                        post("/users")
+                                .content(gson.toJson(notEmail))
+                                .header("X-Sharer-User-Id", user.getId())
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createIncorrectEmail() throws Exception {
+        Mockito.when(userService.create(any()))
+                .thenThrow(ValidatorException.class);
+        User incorrectEmail = User.builder()
+                .name("Lev")
+                .email("Levmail.ru")
+                .build();
+        mockMvc.perform(
+                        post("/users")
+                                .content(gson.toJson(incorrectEmail))
+                                .header("X-Sharer-User-Id", user.getId())
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest());
     }
 
     @Test

@@ -17,6 +17,7 @@ import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.enumeration.Status;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.exceptions.UnknownStatusException;
 import ru.practicum.shareit.exceptions.ValidatorException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.dto.ItemDtoLastNext;
@@ -24,6 +25,7 @@ import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDtoRequest;
 
+import javax.validation.ConstraintViolationException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -35,6 +37,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.booking.enumeration.BookingState.ALL;
+import static ru.practicum.shareit.booking.enumeration.BookingState.UNSUPPORTED_STATUS;
 
 @WebMvcTest(BookingController.class)
 class BookingControllerTest {
@@ -68,10 +71,15 @@ class BookingControllerTest {
         booking = new Booking(1L, LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusDays(1),
                 LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusDays(5), item, booker, Status.WAITING);
         bookingRequestDto = new BookingRequestDto(booking.getStart(), booking.getEnd(), item.getId());
-        bookingDto = new BookingDto(
-                1L, LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-                LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusDays(5), item.getId(),
-                itemDtoLastNext, userDtoRequest, Status.WAITING);
+        bookingDto = BookingDto.builder()
+                .id(1L)
+                .start(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .end(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusDays(5))
+                .itemId(item.getId())
+                .item(itemDtoLastNext)
+                .booker(userDtoRequest)
+                .status(Status.WAITING)
+                .build();
     }
 
     @AfterEach
@@ -186,6 +194,22 @@ class BookingControllerTest {
     }
 
     @Test
+    void getAllBookingUserStatusIncorrect() throws Exception {
+        Mockito
+                .when(bookingService.getAllBookingUser(booker.getId(), UNSUPPORTED_STATUS, 0, 10))
+                .thenThrow(UnknownStatusException.class);
+        mockMvc.perform(
+                        get("/bookings?state={state}&from={from}&size={size}",
+                                UNSUPPORTED_STATUS, 0, 10)
+                                .header("X-Sharer-User-Id", booker.getId())
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void getAllItemsBookingUser() throws Exception {
         Mockito
                 .when(bookingService.getAllItemsBookingUser(owner.getId(), ALL, 0, 10))
@@ -199,5 +223,37 @@ class BookingControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber());
+    }
+
+    @Test
+    void getAllItemsBookingUserStatusIncorrect() throws Exception {
+        Mockito
+                .when(bookingService.getAllItemsBookingUser(owner.getId(), UNSUPPORTED_STATUS, 0, 10))
+                .thenThrow(UnknownStatusException.class);
+        mockMvc.perform(
+                        get("/bookings/owner?state={state}&from={from}&size={size}",
+                                UNSUPPORTED_STATUS, 0, 10)
+                                .header("X-Sharer-User-Id", owner.getId())
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getAllItemsBookingUserIncorrect() throws Exception {
+        Mockito
+                .when(bookingService.getAllItemsBookingUser(owner.getId(), ALL, 0, 0))
+                .thenThrow(ConstraintViolationException.class);
+        mockMvc.perform(
+                        get("/bookings/owner?state={state}&from={from}&size={size}",
+                                ALL, 0, 0)
+                                .header("X-Sharer-User-Id", owner.getId())
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest());
     }
 }

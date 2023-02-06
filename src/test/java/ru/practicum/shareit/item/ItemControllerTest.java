@@ -84,7 +84,7 @@ class ItemControllerTest {
         commentDto = new CommentDto(1L, "good", booker.getName(),
                 LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         itemBookingDto = new ItemBookingDto(item.getId(), item.getName(), item.getDescription(), item.getAvailable(),
-                new BookingDtoLastNext(1L, booker.getId()), new BookingDtoLastNext(2L,
+                new BookingDtoLastNext(1L, User.builder().id(1L).build().getId()), new BookingDtoLastNext(2L,
                 bookerNext.getId()), List.of(commentDto));
         comment = new Comment(1L, "good", item, booker, LocalDateTime.now());
         commentRequestDto = new CommentRequestDto(1L, "good");
