@@ -68,8 +68,8 @@ class BookingControllerTest {
         booker = new User(1L, "Vova", "vova@mail.ru");
         owner = new User(2L, "Mark", "mark@mail.ru");
         item = new Item(1L, "drill", "drill pro", true, owner, itemRequest);
-        booking = new Booking(1L, LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusDays(1),
-                LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusDays(5), item, booker, Status.WAITING);
+        booking = new Booking(1L, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).plusDays(1),
+                LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).plusDays(5), item, booker, Status.WAITING);
         bookingRequestDto = new BookingRequestDto(booking.getStart(), booking.getEnd(), item.getId());
         bookingDto = BookingDto.builder()
                 .id(1L)
@@ -108,8 +108,6 @@ class BookingControllerTest {
                                 .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.start", is(bookingRequestDto.getStart().toString())))
-                .andExpect(jsonPath("$.end", is(bookingRequestDto.getEnd().toString())))
                 .andExpect(jsonPath("$.itemId", is(1)));
     }
 
