@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,50 +89,52 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getAllBookingUser(long userId, BookingState status) {
+    public List<Booking> getAllBookingUser(long userId, BookingState status, int from, int size) {
         LocalDateTime date = LocalDateTime.now();
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+        Pageable pageable = PageRequest.of(from / size, size, sort);
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь не найден"));
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
         switch (status) {
             case ALL:
-                return bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
+                return bookingRepository.findAllByBookerId(userId, pageable).getContent();
             case CURRENT:
                 return bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfter(
-                        userId, date, date, sort);
+                        userId, date, date, pageable).getContent();
             case PAST:
-                return bookingRepository.findAllByBookerIdAndEndBefore(userId, date, sort);
+                return bookingRepository.findAllByBookerIdAndEndBefore(userId, date, pageable).getContent();
             case FUTURE:
-                return bookingRepository.findAllByBookerIdAndStartAfter(userId, date, sort);
+                return bookingRepository.findAllByBookerIdAndStartAfter(userId, date, pageable).getContent();
             case WAITING:
-                return bookingRepository.findAllByBookerIdAndStatus(userId, WAITING, sort);
+                return bookingRepository.findAllByBookerIdAndStatus(userId, WAITING, pageable).getContent();
             case REJECTED:
-                return bookingRepository.findAllByBookerIdAndStatus(userId, REJECTED, sort);
+                return bookingRepository.findAllByBookerIdAndStatus(userId, REJECTED, pageable).getContent();
             default:
                 throw new UnknownStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 
     @Override
-    public List<Booking> getAllItemsBookingUser(long ownerId, BookingState status) {
+    public List<Booking> getAllItemsBookingUser(long ownerId, BookingState status, int from, int size) {
         LocalDateTime date = LocalDateTime.now();
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
+        Pageable pageable = PageRequest.of(from, size, sort);
         userRepository.findById(ownerId).orElseThrow(() ->
                 new NotFoundException("Пользователь не найден"));
         switch (status) {
             case ALL:
-                return bookingRepository.findAllByItem_OwnerId(ownerId, sort);
+                return bookingRepository.findAllByItem_OwnerId(ownerId, pageable);
             case CURRENT:
                 return bookingRepository.findAllByItem_OwnerIdAndStartBeforeAndEndAfter(
-                        ownerId, date, date, sort);
+                        ownerId, date, date, pageable);
             case PAST:
-                return bookingRepository.findAllByItem_OwnerIdAndEndBefore(ownerId, date, sort);
+                return bookingRepository.findAllByItem_OwnerIdAndEndBefore(ownerId, date, pageable);
             case FUTURE:
-                return bookingRepository.findAllByItem_OwnerIdAndStartAfter(ownerId, date, sort);
+                return bookingRepository.findAllByItem_OwnerIdAndStartAfter(ownerId, date, pageable);
             case WAITING:
-                return bookingRepository.findAllByItem_OwnerIdAndStatus(ownerId, WAITING, sort);
+                return bookingRepository.findAllByItem_OwnerIdAndStatus(ownerId, WAITING, pageable);
             case REJECTED:
-                return bookingRepository.findAllByItem_OwnerIdAndStatus(ownerId, REJECTED, sort);
+                return bookingRepository.findAllByItem_OwnerIdAndStatus(ownerId, REJECTED, pageable);
             default:
                 throw new UnknownStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
