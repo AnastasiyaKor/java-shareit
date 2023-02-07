@@ -49,13 +49,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDtoResult> getAllUser(Long userId) {
         List<ItemRequestDtoResult> getAllItemRequest = new ArrayList<>();
         List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequestor_Id(userId);
-        Map<ItemRequest, List<Item>> items = itemRepository.findAllByRequestIdIn(itemRequests)
+        Map<ItemRequest, List<Item>> items = itemRepository.findAllByRequestIdInAndAvailableTrue(itemRequests)
                 .stream()
-                .filter(item -> item.getAvailable().equals(true))
                 .collect(groupingBy(Item::getRequestId, toList()));
         return getItemRequestDtoResults(getAllItemRequest, itemRequests, items);
     }
-
 
     @Override
     public List<ItemRequestDtoResult> getAll(Long userId, int from, int size) {
@@ -66,8 +64,24 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return getItemRequestDtoResults(getAllItemRequest, itemRequests, items);
     }
 
+    @Override
+    public ItemRequestDtoResult getRequestId(Long userId, Long requestId) {
+        ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(() ->
+                new NotFoundException("запрос не найден"));
+        List<Item> items = itemRepository.findByRequestId(itemRequest);
+        List<ItemItemRequestDto> itemsToAnswer;
+        if (!items.isEmpty()) {
+            itemsToAnswer = items.stream()
+                    .map(ItemMapper::toItemItemRequestDto)
+                    .collect(toList());
+            return ItemRequestMapper.toItemRequestItemDto(itemRequest, itemsToAnswer);
+        }
+        return ItemRequestMapper.toItemRequestItemDto(itemRequest, Collections.emptyList());
+    }
+
     private List<ItemRequestDtoResult> getItemRequestDtoResults(List<ItemRequestDtoResult> getAllItemRequest,
-                                                                List<ItemRequest> itemRequests, Map<ItemRequest, List<Item>> items) {
+                                                                List<ItemRequest> itemRequests, Map<ItemRequest,
+            List<Item>> items) {
         for (ItemRequest ir : itemRequests) {
             ItemRequestDtoResult itemRequestDtoResult;
             List<ItemItemRequestDto> itemsToAnswer;
@@ -88,26 +102,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private Map<ItemRequest, List<Item>> itemRequestListMap(List<ItemRequest> itemRequests) {
-        Map<ItemRequest, List<Item>> items = itemRepository.findAllByRequestIdIn(itemRequests)
+        Map<ItemRequest, List<Item>> items = itemRepository.findAllByRequestIdInAndAvailableTrue(itemRequests)
                 .stream()
-                .filter(item -> item.getAvailable().equals(true))
                 .collect(groupingBy(Item::getRequestId, toList()));
         return items;
     }
-
-    @Override
-    public ItemRequestDtoResult getRequestId(Long userId, Long requestId) {
-        ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(() ->
-                new NotFoundException("запрос не найден"));
-        List<Item> items = itemRepository.findByRequestId(itemRequest);
-        List<ItemItemRequestDto> itemsToAnswer;
-        if (!items.isEmpty()) {
-            itemsToAnswer = items.stream()
-                    .map(ItemMapper::toItemItemRequestDto)
-                    .collect(toList());
-            return ItemRequestMapper.toItemRequestItemDto(itemRequest, itemsToAnswer);
-        }
-        return ItemRequestMapper.toItemRequestItemDto(itemRequest, Collections.emptyList());
-    }
-
 }

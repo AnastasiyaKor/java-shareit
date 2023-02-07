@@ -10,12 +10,15 @@ import ru.practicum.shareit.request.dto.ItemRequestDtoResult;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.service.UserService;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
     private final UserService userService;
@@ -38,8 +41,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestDtoResult> getAll(@RequestHeader("X-Sharer-User-id") Long userId,
-                                             @RequestParam(required = false, defaultValue = "0") int from,
-                                             @RequestParam(required = false, defaultValue = "10") int size) {
+                                             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                             @RequestParam(defaultValue = "10") @Positive int size) {
         userService.getById(userId);
         return itemRequestService.getAll(userId, from, size);
     }

@@ -99,7 +99,7 @@ class ItemRequestServiceImplTest {
                 .when(itemRequestRepository.findAllByRequestor_Id(owner.getId()))
                 .thenReturn(List.of(itemRequest));
         Mockito
-                .when(itemRepository.findAllByRequestIdIn(Mockito.any()))
+                .when(itemRepository.findAllByRequestIdInAndAvailableTrue(Mockito.any()))
                 .thenReturn(List.of(item));
         List<ItemRequestDtoResult> itemRequestDtoResults = itemRequestService.getAllUser(owner.getId());
         assertEquals(itemRequestDtoResults, list);
@@ -116,7 +116,7 @@ class ItemRequestServiceImplTest {
                 .when(itemRequestRepository.findAllByRequestor_IdNot(Mockito.any(), any(Pageable.class)))
                 .thenReturn(List.of(itemRequest));
         Mockito
-                .when(itemRepository.findAllByRequestIdIn(Mockito.any()))
+                .when(itemRepository.findAllByRequestIdInAndAvailableTrue(Mockito.any()))
                 .thenReturn(List.of(item));
 
         List<ItemRequestDtoResult> itemRequestDtoResults = itemRequestService.getAll(requestor.getId(), 0, 10);

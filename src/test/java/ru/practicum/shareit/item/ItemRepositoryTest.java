@@ -69,13 +69,14 @@ class ItemRepositoryTest {
     void findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue() {
         String text = "drill";
         List<Item> items = itemRepository
-                .findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text, pageable);
+                .findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue(text,
+                        text, pageable);
         assertEquals(1, items.size());
     }
 
     @Test
     void findAllByRequestIdIn() {
-        List<Item> items = itemRepository.findAllByRequestIdIn(List.of(itemRequest));
+        List<Item> items = itemRepository.findAllByRequestIdInAndAvailableTrue(List.of(itemRequest));
         assertEquals(1, items.size());
     }
 

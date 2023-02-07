@@ -10,7 +10,8 @@ import ru.practicum.shareit.booking.enumeration.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -47,9 +48,9 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getAllBookingUser(@RequestHeader("X-Sharer-User-id") long userId,
-                                              @RequestParam(required = false, defaultValue = "ALL") BookingState state,
-                                              @RequestParam(required = false, defaultValue = "0") @Min(0) int from,
-                                              @RequestParam(required = false, defaultValue = "10") @Min(1) int size) {
+                                              @RequestParam(defaultValue = "ALL") BookingState state,
+                                              @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                              @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("Получен запрос на просмотр списка всех бронирований пользователя");
 
         List<Booking> bookings = bookingService.getAllBookingUser(userId, state, from, size);
@@ -59,10 +60,10 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDto> getAllItemsBookingUser(@RequestHeader("X-Sharer-User-id") long userId,
                                                    @RequestParam(defaultValue = "ALL") BookingState state,
-                                                   @RequestParam(required = false, defaultValue = "0")
-                                                   @Min(0) int from,
-                                                   @RequestParam(required = false, defaultValue = "10")
-                                                   @Min(1) int size) {
+                                                   @RequestParam(defaultValue = "0")
+                                                   @PositiveOrZero int from,
+                                                   @RequestParam(defaultValue = "10")
+                                                   @Positive int size) {
         log.info("Получен запрос на просмотр списка бронирований для всех вещей пользователя");
         List<Booking> bookings = bookingService.getAllItemsBookingUser(userId, state, from, size);
         return BookingMapper.toListBookingDto(bookings);
