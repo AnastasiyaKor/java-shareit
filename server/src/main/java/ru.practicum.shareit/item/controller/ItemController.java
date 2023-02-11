@@ -36,7 +36,7 @@ public class ItemController {
     @PostMapping
     public ItemDto add(@RequestBody @Validated({Marker.Create.class}) ItemDto itemDto,
                 @RequestHeader("X-Sharer-User-id") long userId) {
-        log.info("Получен запрос от пользователя: " + userId + " на добавление вещи");
+        log.info("Получен запрос от пользователя: {} на добавление вещи", userId);
         User user = userService.getById(userId);
         UserDto userDto = UserMapper.toUserDto(user);
         itemDto.setOwner(userDto);
@@ -49,7 +49,7 @@ public class ItemController {
     public CommentDto createComment(@Validated @RequestBody CommentRequestDto commentRequestDto,
                              @RequestHeader("X-Sharer-User-id") Long userId,
                              @PathVariable Long itemId) {
-        log.info("Получен запрос от пользователя: " + userId + " на добавление комментария");
+        log.info("Получен запрос от пользователя: {} на добавление комментария", userId);
         itemService.getById(itemId);
         userService.getById(userId);
         Comment comment = itemService.createComment(commentRequestDto, userId, itemId);
@@ -60,7 +60,7 @@ public class ItemController {
     public ItemDto update(@RequestBody @Validated({Marker.Update.class}) ItemDto itemDto,
                    @RequestHeader("X-Sharer-User-id") Long userId,
                    @PathVariable Long itemId) {
-        log.info("Получен запрос от пользователя " + userId + " на редактирование вещи под идентификатором: " + itemId);
+        log.info("Получен запрос от пользователя {} на редактирование вещи под идентификатором: {}", userId, itemId);
         User user = userService.getById(userId);
         UserDto userDto = UserMapper.toUserDto(user);
         itemDto.setOwner(userDto);
@@ -70,23 +70,23 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public ItemBookingDto getByItemId(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
-        log.info("Получен запрос от пользователя " + userId + " на просмотр вещи под идентификатором: " + itemId);
+        log.info("Получен запрос от пользователя {} на просмотр вещи под идентификатором: {}", userId, itemId);
         return itemService.getByItemId(itemId, userId);
     }
 
     @GetMapping
     public List<ItemBookingDto> getAll(@RequestHeader("X-Sharer-User-id") Long userId,
-                                @RequestParam(required = false,defaultValue = "0") int from,
-                                @RequestParam(required = false,defaultValue = "10") int size) {
-        log.info("Получен запрос от пользователя " + userId + " на просмотр всех своих вещей");
+                                @RequestParam(defaultValue = "0") int from,
+                                @RequestParam(defaultValue = "10") int size) {
+        log.info("Получен запрос от пользователя {} на просмотр всех своих вещей", userId);
         return itemService.getAll(userId, from, size);
     }
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text, @RequestHeader("X-Sharer-User-id") long userId,
-                         @RequestParam(required = false,defaultValue = "0") int from,
-                         @RequestParam(required = false,defaultValue = "10") int size) {
-        log.info("Получен запрос от пользователя " + userId + " на поиск вещи");
+                         @RequestParam(defaultValue = "0") int from,
+                         @RequestParam(defaultValue = "10") int size) {
+        log.info("Получен запрос от пользователя {} на поиск вещи", userId);
         List<Item> items = Collections.emptyList();
         if (!text.isBlank()) {
             items = itemService.search(text, userId, from, size);

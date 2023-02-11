@@ -21,13 +21,12 @@ import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnknownStatusException;
 import ru.practicum.shareit.exception.ValidatorException;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.dto.ItemDtoLastNext;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDtoRequest;
 
-import javax.validation.ConstraintViolationException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -233,22 +232,6 @@ class BookingControllerTest {
         mockMvc.perform(
                         get("/bookings/owner?state={state}&from={from}&size={size}",
                                 UNSUPPORTED_STATUS, 0, 10)
-                                .header("X-Sharer-User-Id", owner.getId())
-                                .characterEncoding(StandardCharsets.UTF_8)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void getAllItemsBookingUserIncorrect() throws Exception {
-        Mockito
-                .when(bookingService.getAllItemsBookingUser(owner.getId(), ALL, 0, 0))
-                .thenThrow(ConstraintViolationException.class);
-        mockMvc.perform(
-                        get("/bookings/owner?state={state}&from={from}&size={size}",
-                                ALL, 0, 0)
                                 .header("X-Sharer-User-Id", owner.getId())
                                 .characterEncoding(StandardCharsets.UTF_8)
                                 .contentType(MediaType.APPLICATION_JSON)
