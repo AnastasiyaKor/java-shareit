@@ -37,7 +37,7 @@ PEST сервис с микросервисной архитектурой дл�
 
 *Стек*
 * Spring Boot, Maven, REST API, Hibernate, JPA, Lombok, JUnit, Mockito, PostgreSql, H2, Docker
-* Приложение написано на Java 17. Пример кода:
+* Приложение написано на Java 11. Пример кода:
 ```java
 public class Practicum {
     public static void main(String[] args) {
